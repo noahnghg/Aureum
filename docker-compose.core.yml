@@ -1,0 +1,93 @@
+version: '3.8'
+
+services:
+  # Databases
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: aureum_db
+      POSTGRES_USER: aureum_user
+      POSTGRES_PASSWORD: aureum_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/database/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./infrastructure/database/mongodb/init.js:/docker-entrypoint-initdb.d/init.js
+
+  # Message Queue
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # User Service
+  user-service:
+    build: ./backend/user-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: aureum_db
+      POSTGRES_USERNAME: aureum_user
+      POSTGRES_PASSWORD: aureum_password
+    depends_on:
+      - postgres
+
+  # API Gateway (simplified - only routes to user-service for now)
+  api-gateway:
+    build: ./backend/api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - user-service
+
+  # AI Model Service (Python Flask)
+  ai-model-service:
+    build: ./ai-service
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: production
+
+  # Frontend (React)
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    environment:
+      REACT_APP_API_URL: http://localhost:8080
+      REACT_APP_PLAID_ENV: sandbox
+    depends_on:
+      - api-gateway
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  rabbitmq_data:
+  redis_data:

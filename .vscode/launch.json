@@ -1,0 +1,36 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug User Service",
+            "type": "java",
+            "request": "launch",
+            "mainClass": "com.aureum.userservice.UserServiceApplication",
+            "projectName": "user-service",
+            "cwd": "${workspaceFolder}/backend/user-service",
+            "env": {
+                "SPRING_PROFILES_ACTIVE": "dev"
+            },
+            "args": []
+        },
+        {
+            "name": "Debug AI Service",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/ai-service/app.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/ai-service",
+            "env": {
+                "FLASK_ENV": "development",
+                "FLASK_DEBUG": "1"
+            }
+        },
+        {
+            "name": "Attach to User Service",
+            "type": "java",
+            "request": "attach",
+            "hostName": "localhost",
+            "port": 8000
+        }
+    ]
+}

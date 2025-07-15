@@ -1,0 +1,165 @@
+version: '3.8'
+
+services:
+  # Databases
+  postgres:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: aureum_db
+      POSTGRES_USER: aureum_user
+      POSTGRES_PASSWORD: aureum_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infrastructure/database/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  mongodb:
+    image: mongo:5.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data:/data/db
+      - ./infrastructure/database/mongodb/init.js:/docker-entrypoint-initdb.d/init.js
+
+  # Message Queue
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+  # Redis for caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # API Gateway
+  api-gateway:
+    build: ./backend/api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - user-service
+      - open-banking-service
+      - data-processing-service
+      - ai-insights-service
+      - investment-advisory-service
+      - notification-service
+
+  # User Service
+  user-service:
+    build: ./backend/user-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: aureum_db
+      POSTGRES_USERNAME: aureum_user
+      POSTGRES_PASSWORD: aureum_password
+    depends_on:
+      - postgres
+
+  # Open Banking Service
+  open-banking-service:
+    build: ./backend/open-banking-service
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      RABBITMQ_HOST: rabbitmq
+      PLAID_CLIENT_ID: ${PLAID_CLIENT_ID}
+      PLAID_SECRET: ${PLAID_SECRET}
+      PLAID_ENVIRONMENT: sandbox
+    depends_on:
+      - rabbitmq
+
+  # Data Processing Service
+  data-processing-service:
+    build: ./backend/data-processing-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      MONGODB_HOST: mongodb
+      MONGODB_PORT: 27017
+      RABBITMQ_HOST: rabbitmq
+    depends_on:
+      - mongodb
+      - rabbitmq
+
+  # AI Insights Service
+  ai-insights-service:
+    build: ./backend/ai-insights-service
+    ports:
+      - "8084:8084"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_HOST: postgres
+      RABBITMQ_HOST: rabbitmq
+      AI_SERVICE_URL: http://ai-model-service:5000
+    depends_on:
+      - postgres
+      - rabbitmq
+      - ai-model-service
+
+  # Investment Advisory Service
+  investment-advisory-service:
+    build: ./backend/investment-advisory-service
+    ports:
+      - "8085:8085"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      POSTGRES_HOST: postgres
+    depends_on:
+      - postgres
+
+  # Notification Service
+  notification-service:
+    build: ./backend/notification-service
+    ports:
+      - "8086:8086"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      RABBITMQ_HOST: rabbitmq
+      TWILIO_ACCOUNT_SID: ${TWILIO_ACCOUNT_SID}
+      TWILIO_AUTH_TOKEN: ${TWILIO_AUTH_TOKEN}
+    depends_on:
+      - rabbitmq
+
+  # AI Model Service (Python Flask)
+  ai-model-service:
+    build: ./ai-service
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: production
+
+  # Frontend (React)
+  frontend:
+    build: ./frontend
+    ports:
+      - "3000:80"
+    environment:
+      REACT_APP_API_URL: http://localhost:8080
+      REACT_APP_PLAID_ENV: sandbox
+    depends_on:
+      - api-gateway
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  rabbitmq_data:
+  redis_data:

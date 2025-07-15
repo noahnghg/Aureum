@@ -1,0 +1,137 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Aureum Platform",
+            "type": "shell",
+            "command": "./scripts/build.sh",
+            "group": "build",
+            "isBackground": false,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Setup Development Environment",
+            "type": "shell",
+            "command": "./scripts/setup-dev.sh",
+            "group": "build",
+            "isBackground": false,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Start Infrastructure Services",
+            "type": "shell",
+            "command": "docker-compose up -d postgres mongodb rabbitmq redis",
+            "group": "build",
+            "isBackground": false,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Start All Services",
+            "type": "shell",
+            "command": "docker-compose up",
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Build User Service",
+            "type": "shell",
+            "command": "mvn clean package -DskipTests",
+            "group": "build",
+            "isBackground": false,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/backend/user-service"
+            }
+        },
+        {
+            "label": "Run User Service",
+            "type": "shell",
+            "command": "mvn spring-boot:run",
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/backend/user-service"
+            }
+        },
+        {
+            "label": "Test User Service",
+            "type": "shell",
+            "command": "mvn test",
+            "group": "test",
+            "isBackground": false,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/backend/user-service"
+            }
+        },
+        {
+            "label": "Run AI Service",
+            "type": "shell",
+            "command": "python app.py",
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/ai-service"
+            }
+        },
+        {
+            "label": "Stop All Services",
+            "type": "shell",
+            "command": "docker-compose down",
+            "group": "build",
+            "isBackground": false,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "Start Frontend Development",
+            "type": "shell",
+            "command": "npm start",
+            "group": "build",
+            "isBackground": true,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/frontend"
+            }
+        },
+        {
+            "label": "Build Frontend",
+            "type": "shell",
+            "command": "npm run build",
+            "group": "build",
+            "isBackground": false,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/frontend"
+            }
+        },
+        {
+            "label": "Install Frontend Dependencies",
+            "type": "shell",
+            "command": "npm install",
+            "group": "build",
+            "isBackground": false,
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceFolder}/frontend"
+            }
+        }
+    ]
+}

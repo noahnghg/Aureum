@@ -1,0 +1,13 @@
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/security/JwtRequestFilter.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/entity/User.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/dto/AuthResponse.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/security/JwtUtil.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/dto/RegisterRequest.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/repository/UserRepository.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/UserServiceApplication.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/dto/UserDto.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/security/JwtAuthenticationEntryPoint.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/controller/UserController.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/security/SecurityConfig.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/dto/LoginRequest.java
+/Users/noahnghg/Aureum/backend/user-service/src/main/java/com/aureum/userservice/service/UserService.java
